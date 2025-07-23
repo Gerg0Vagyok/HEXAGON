@@ -221,9 +221,11 @@ class HEXAGON {
                         console.log(obj.Operation)
                         for (let j = 0; j < obj.Operation.length; j++) {
                             const TwoElements = obj.Values.slice(j, j+2);
-                            obj.Values.splice(j, j+2);
+                            //obj.Values.splice(j, j+2);
                             obj.Values.splice(j, 2);
-                            obj.Values.unshift(TwoElements)// fix this
+                            obj.Values.unshift({Values: TwoElements, Operation: obj.Operation[j]});// fix this????
+                            obj.Operation.shift();
+                            //i--;
                             console.log(obj)
                         }
                     }
