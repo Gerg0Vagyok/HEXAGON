@@ -219,7 +219,7 @@ class HEXAGON {
                     if (obj.Values.length > 2) {
                         console.log("This group has more than 2 values, consider restructuring.");
                         console.log(obj.Operation)
-                        for (let j = 0; j < obj.Operation.length; j++) {
+                        for (let j = 0; j < obj.Operation.length && obj.Operation.length > 1; j++) {
                             const TwoElements = obj.Values.slice(j, j+2);
                             //obj.Values.splice(j, j+2);
                             obj.Values.splice(j, 2);
@@ -229,13 +229,18 @@ class HEXAGON {
                             console.log(obj)
                         }
                     }
-                    descend(val, [...path, i], [...length, obj.Values.length]);
+                    descend(obj.Values[i], [...path, i], [...length, obj.Values.length]);
                 }
             }
         }
 
-        descend(DoubleGrouped);
-        return DoubleGrouped;
+        let ActuallyGrouped = DoubleGrouped;
+        descend(ActuallyGrouped)
+        while (JSON.stringify(ActuallyGrouped) !== JSON.stringify(DoubleGrouped)) {
+            DoubleGrouped = ActuallyGrouped;
+            descend(ActuallyGrouped);
+        }
+        return ActuallyGrouped;
     }
     
     static MathParser(MathExpressionString) {
@@ -494,6 +499,7 @@ const TestExp = "1.6*(14.12+1.6*(14.12+1)*(1.6*(14.12+1-12)+12+1))";
 const a = HEXAGON.MathParser(TestExp);
 //a.forEach((el, i) => console.log(i + ": " + el))
 console.log(a)
+console.log(JSON.stringify(a, null, 2));
 //console.log('"`')
 //console.log(`" ' `)
 //console.log('"`')
