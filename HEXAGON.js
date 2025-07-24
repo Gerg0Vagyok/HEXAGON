@@ -208,30 +208,114 @@ class HEXAGON {
 			"/": 2,
 		};
 
+		function SwapArrayElements(arr, i1, i2) {
+			const el = arr[i2];
+			arr[i2] = arr[i1];
+			arr[i1] = el;
+		}
+
 		function descend(obj, path = [], length = []) {
 			//console.log(path);
 			if (!obj || !obj.Values /*|| obj.Values.length < 2*/) return;
 			for (let i = 0; i < obj.Values.length; i++) {
 				const val = obj.Values[i];
 				if (val) {
-					console.log([...path, i]);
-					console.log([...length, obj.Values.length]);
-					if (obj.Values.length > 2) {
-						console.log("This group has more than 2 values, consider restructuring.");
-						console.log(obj.Operation)
+					//console.log([...path, i]);
+					//console.log([...length, obj.Values.length]);
+					if (obj.Values.length > 2) {/*
+						//console.log("This group has more than 2 values, consider restructuring.");
+						//console.log(obj.Operation)
 						let OperationBackshift = 0;
-						let OperationForwardshift = 0;
-						for (let j = 0; j < obj.Operation.length && obj.Operation.length > 1; j++) {
+						let HasLevel = new Set();
+						let LargestLevel = 0;
+
+
+						if (obj.Operation.includes("*") || obj.Operation.includes("/")) {
+							HasLevel.add(2);
+						} else if (HasLevel.has(2)) {
+							HasLevel.delete(2);
+						}
+						if (obj.Operation.includes("+") || obj.Operation.includes("-")) {
+							HasLevel.add(1);
+						} else if (HasLevel.has(1)) {
+							HasLevel.delete(1);
+						}
+						LargestLevel = Math.max(...HasLevel);
+
+						let NONS = 0;
+						for (let o = 0; !(NONS === obj.Operation.length || o >= obj.Operation.length); o++ ) {
+							NONS = 0;
+							for (let j = 0; j < obj.Operation.length; j++) {
+								if (Order[obj.Operation[j]] < Order[obj.Operation[j+1]]) {
+									//console.log(JSON.parse(JSON.stringify(obj)));
+									SwapArrayElements(obj.Operation, j, j+1);
+
+
+									SwapArrayElements(obj.Values, j+1, j+2)
+									//let temp = obj.Values[j+2];
+									//obj.Values.splice(j+2, 1);
+									//obj.Values.splice(j, 0, temp);
+									//SwapArrayElements(obj.Values, j+1, j+2);
+									//SwapArrayElements(obj.Values, j, j+1);
+								} else {
+									NONS++;
+								}
+							}
+							console.log(JSON.stringify(obj.Operation));
+							console.log(JSON.stringify(obj.Values))
+							//console.log(JSON.parse(JSON.stringify(obj)))
+						}
+
+						/*for (let j = 0; j < obj.Operation.length && obj.Operation.length > 1; j++) {
 							const TwoElements = obj.Values.slice(j, j+2);
 							//obj.Values.splice(j, j+2);
 							obj.Values.splice(j, 2);
-							
 							obj.Values.unshift({Values: TwoElements, Operation: obj.Operation[j - OperationBackshift]});// fix this???? is it fixed????? Yes it is.
 							obj.Operation.shift();
 							OperationBackshift++;
 							//i--;
-							console.log(obj)
-						}
+							//console.log(obj)
+
+						}*//*
+						while (obj.Operation.length > 1) {
+							// Find the index of the highest precedence operation
+							let maxPrecedence = 0;
+							let maxIndex = 0;
+							for (let k = 0; k < obj.Operation.length; k++) {
+								if (Order[obj.Operation[k]] > maxPrecedence) {
+									maxPrecedence = Order[obj.Operation[k]];
+									maxIndex = k;
+								}
+							}
+
+							// Group the values around this operation
+							const TwoElements = [obj.Values[maxIndex], obj.Values[maxIndex + 1]];
+							const operation = obj.Operation[maxIndex];
+
+							// Remove the two values and the operation
+							obj.Values.splice(maxIndex, 2, {Values: TwoElements, Operation: operation});
+							obj.Operation.splice(maxIndex, 1);*/
+							// Process operations by precedence without sorting
+							while (obj.Operation.length > 1) {
+								// Find the highest precedence operation
+								let maxPrecedence = 0;
+								let maxIndex = 0;
+								for (let k = 0; k < obj.Operation.length; k++) {
+									if (Order[obj.Operation[k]] >= maxPrecedence) {
+										maxPrecedence = Order[obj.Operation[k]];
+										maxIndex = k;
+									}
+								}
+								
+								// Group the values around this operation
+								const TwoElements = [obj.Values[maxIndex], obj.Values[maxIndex + 1]];
+								const operation = obj.Operation[maxIndex];
+								
+								// Replace the two values with the grouped operation
+								obj.Values.splice(maxIndex, 2, {Values: TwoElements, Operation: operation});
+								obj.Operation.splice(maxIndex, 1);
+							}
+						
 					}
 					descend(obj.Values[i], [...path, i], [...length, obj.Values.length]);
 				}
@@ -500,7 +584,7 @@ if (false) {
 
 //a = HEXAGON.ExecuteString(TestCode3)
 const TestExp 	= "1.6*(14.12+1.6*(14.12+1)*(1.6*(14.12+1-12)+12+1))";
-const TestExp2	= "16+1*4+6"
+const TestExp2	= "16+1*4+6*1+1"
 const a = HEXAGON.MathParser(TestExp2);
 //a.forEach((el, i) => console.log(i + ": " + el))
 console.log(a)
